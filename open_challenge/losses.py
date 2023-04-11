@@ -13,7 +13,7 @@ class OursLoss(nn.Module):
     def forward(self, output, target):
         epevalue = 0
         target = self.div_flow * target
-        assert output.shape == target.shape, (output.shape, target.shape)
+        # assert output.shape == target.shape, (output.shape, target.shape)
         ''' Implement the your loss here'''
         ''''''
         for i, output_ in enumerate(output):
