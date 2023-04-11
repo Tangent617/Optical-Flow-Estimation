@@ -5,6 +5,8 @@ from torch.nn import init
 import math
 import numpy as np
 
+from .submodules import *
+
 # ref: https://github.com/NVIDIA/flownet2-pytorch/blob/master/networks/FlowNetSD.py
 class FlowNetOurs(nn.Module):
     def __init__(self, args, input_channels = 6, div_flow=20):
@@ -16,35 +18,35 @@ class FlowNetOurs(nn.Module):
         '''Implement Codes here'''
         ''''''
         self.batchNorm = True
-        self.conv0   = nn.conv(self.batchNorm,  6,   64)
-        self.conv1   = nn.conv(self.batchNorm,  64,   64, stride=2)
-        self.conv1_1 = nn.conv(self.batchNorm,  64,   128)
-        self.conv2   = nn.conv(self.batchNorm,  128,  128, stride=2)
-        self.conv2_1 = nn.conv(self.batchNorm,  128,  128)
-        self.conv3   = nn.conv(self.batchNorm, 128,  256, stride=2)
-        self.conv3_1 = nn.conv(self.batchNorm, 256,  256)
-        self.conv4   = nn.conv(self.batchNorm, 256,  512, stride=2)
-        self.conv4_1 = nn.conv(self.batchNorm, 512,  512)
-        self.conv5   = nn.conv(self.batchNorm, 512,  512, stride=2)
-        self.conv5_1 = nn.conv(self.batchNorm, 512,  512)
-        self.conv6   = nn.conv(self.batchNorm, 512, 1024, stride=2)
-        self.conv6_1 = nn.conv(self.batchNorm,1024, 1024)
+        self.conv0   = conv(self.batchNorm,  6,   64)
+        self.conv1   = conv(self.batchNorm,  64,   64, stride=2)
+        self.conv1_1 = conv(self.batchNorm,  64,   128)
+        self.conv2   = conv(self.batchNorm,  128,  128, stride=2)
+        self.conv2_1 = conv(self.batchNorm,  128,  128)
+        self.conv3   = conv(self.batchNorm, 128,  256, stride=2)
+        self.conv3_1 = conv(self.batchNorm, 256,  256)
+        self.conv4   = conv(self.batchNorm, 256,  512, stride=2)
+        self.conv4_1 = conv(self.batchNorm, 512,  512)
+        self.conv5   = conv(self.batchNorm, 512,  512, stride=2)
+        self.conv5_1 = conv(self.batchNorm, 512,  512)
+        self.conv6   = conv(self.batchNorm, 512, 1024, stride=2)
+        self.conv6_1 = conv(self.batchNorm,1024, 1024)
 
-        self.deconv5 = nn.deconv(1024,512)
-        self.deconv4 = nn.deconv(1026,256)
-        self.deconv3 = nn.deconv(770,128)
-        self.deconv2 = nn.deconv(386,64)
+        self.deconv5 = deconv(1024,512)
+        self.deconv4 = deconv(1026,256)
+        self.deconv3 = deconv(770,128)
+        self.deconv2 = deconv(386,64)
 
-        self.inter_conv5 = nn.i_conv(self.batchNorm,  1026,   512)
-        self.inter_conv4 = nn.i_conv(self.batchNorm,  770,   256)
-        self.inter_conv3 = nn.i_conv(self.batchNorm,  386,   128)
-        self.inter_conv2 = nn.i_conv(self.batchNorm,  194,   64)
+        self.inter_conv5 = i_conv(self.batchNorm,  1026,   512)
+        self.inter_conv4 = i_conv(self.batchNorm,  770,   256)
+        self.inter_conv3 = i_conv(self.batchNorm,  386,   128)
+        self.inter_conv2 = i_conv(self.batchNorm,  194,   64)
 
-        self.predict_flow6 = nn.predict_flow(1024)
-        self.predict_flow5 = nn.predict_flow(512)
-        self.predict_flow4 = nn.predict_flow(256)
-        self.predict_flow3 = nn.predict_flow(128)
-        self.predict_flow2 = nn.predict_flow(64)
+        self.predict_flow6 = predict_flow(1024)
+        self.predict_flow5 = predict_flow(512)
+        self.predict_flow4 = predict_flow(256)
+        self.predict_flow3 = predict_flow(128)
+        self.predict_flow2 = predict_flow(64)
 
         self.upsampled_flow6_to_5 = nn.ConvTranspose2d(2, 2, 4, 2, 1)
         self.upsampled_flow5_to_4 = nn.ConvTranspose2d(2, 2, 4, 2, 1)
@@ -63,6 +65,7 @@ class FlowNetOurs(nn.Module):
                 init.xavier_uniform_(m.weight)
                 # init_deconv_bilinear(m.weight)
         self.upsample1 = nn.Upsample(scale_factor=4, mode='bilinear')
+
 
     def forward(self, inputs):
         ## input normalization
