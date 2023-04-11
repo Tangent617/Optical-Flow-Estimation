@@ -8,6 +8,7 @@ class OursLoss(nn.Module):
         super(OursLoss, self).__init__()
         self.div_flow = div_flow 
         self.loss_labels = ['Ours'],
+        self.loss_weights = tuple([0.32, 0.16, 0.08, 0.04])
 
     def forward(self, output, target):
         epevalue = 0
@@ -15,5 +16,8 @@ class OursLoss(nn.Module):
         assert output.shape == target.shape, (output.shape, target.shape)
         ''' Implement the your loss here'''
         ''''''
-        epevalue = torch.norm(target - output, p=2, dim=1).mean()
+        for i, output_ in enumerate(output):
+            target_ = F.interpolate(target, output_.shape[2:], mode='bilinear', align_corners=False)
+            assert output_.shape == target_.shape, (output_.shape, target_.shape)
+            epevalue += self.loss_weights[i] * torch.norm(target_ - output_, p=2, dim=1).mean()
         return [epevalue]
