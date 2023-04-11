@@ -15,4 +15,5 @@ class OursLoss(nn.Module):
         assert output.shape == target.shape, (output.shape, target.shape)
         ''' Implement the your loss here'''
         ''''''
+        epevalue = torch.norm(target - output, p=2, dim=1).mean()
         return [epevalue]

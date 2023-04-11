@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import math
 
+# ref: https://github.com/RaynorLEE/ENGG5104_ass4
 class EPELoss(nn.Module):
     def __init__(self, args, div_flow = 0.05):
         super(EPELoss, self).__init__()
